@@ -13,6 +13,9 @@ inputs:
     description: Source file path.
   DESTINATION:
     description: Destination path, relative to repository root.
+  ARTIFACT_NAME:
+    description: Name for build artifact.
+    default: "spec-prod-result"
   BUILD_FAIL_ON:
     description: Exit behaviour on errors.
     default: fatal
@@ -115,6 +118,16 @@ runs:
       shell: bash
       env:
         INPUTS_BUILD: ${{ steps.prepare.outputs.build && toJSON(fromJson(steps.prepare.outputs.build)) }}
+
+    - name: Upload Build Artifacts
+      id: upload-build-artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        path: |-
+          ${{ steps.build.outputs.gh && fromJson(steps.build.outputs.gh).dest }}
+          ${{ steps.build.outputs.w3c && fromJson(steps.build.outputs.w3c).dest }}
+        name: ${{ inputs.ARTIFACT_NAME }}
+        retention-days: 5
 
     - name: Validate hyperlinks
       if: ${{ success() && steps.prepare.outputs.validate && fromJson(steps.prepare.outputs.validate).links }}
