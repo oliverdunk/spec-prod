@@ -116,16 +116,6 @@ runs:
       env:
         INPUTS_BUILD: ${{ steps.prepare.outputs.build && toJSON(fromJson(steps.prepare.outputs.build)) }}
 
-    - name: Upload Build Artifacts
-      id: upload-build-artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        path: |-
-          ${{ steps.build.outputs.gh && fromJson(steps.build.outputs.gh).dest }}
-          ${{ steps.build.outputs.w3c && fromJson(steps.build.outputs.w3c).dest }}
-        name: spec-prod-result
-        retention-days: 5
-
     - name: Validate hyperlinks
       if: ${{ success() && steps.prepare.outputs.validate && fromJson(steps.prepare.outputs.validate).links }}
       run: |
